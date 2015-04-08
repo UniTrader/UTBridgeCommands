@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<diff>
+  <replace sel="//cue[@name=&quot;SectorMapStarted&quot;]/actions">
+    <actions>
+      <do_if value="player.entity.container.isclass.ship and player.controlled != player.primaryship and player.entity.container.owner == faction.player">
+        <signal_cue cue="md.UT_Platform_Commands.Ship_On_Hotkey_Press"/>
+      </do_if>
+      <!-- redirect Sectormap Hotkey only when on a Bridge - otherwise Vanilla behavior -->
+      <do_else>
+        <do_if value="event.name == 'event_conversation_returned_to_section'">
+          <open_conversation_menu menu="MapMenu" param="event.param2" param2="event.param3"/>
+        </do_if>
+        <do_else>
+          <do_if value="player.primaryship.sector.exists">
+            <open_conversation_menu menu="MapMenu" param="[0, 0, 'sector', player.primaryship.sector, null, player.primaryship.zone]"/>
+          </do_if>
+          <do_else>
+            <open_conversation_menu menu="MapMenu" param="[0, 0, 'cluster', player.primaryship.cluster]"/>
+          </do_else>
+        </do_else>
+        <add_conversation_view view="closeupdetailmonitor"/>
+      </do_else>
+    </actions>
+  </replace>
+</diff>

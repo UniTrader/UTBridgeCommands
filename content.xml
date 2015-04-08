@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="../../content.xsl"?>
+<content id="UTBridgeCommands" name="Bridge Commands" description="Replaces the Sector Map Hotkey with a ney, context-sensitive, Command Hotkey when on one of your Ship landing Pads (also removes the Skunk from the default Platform)" author="UniTrader" date="2015-04-06" version="10" save="false" uninstaller="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/content.xsd">
+  <text language="44" name="Bridge Commands" description="Replaces the Sector Map Hotkey with a ney, context-sensitive, Command Hotkey when on one of your Ship landing Pads (also removes the Skunk from the default Platform)" author="UniTrader">
+    <info site="forum.egosoft.com" url="http://forum.egosoft.com/viewtopic.php?t=379177" />
+  </text>
+  <text language="49" name="Brückenkommandos" description="Ersetzt den Hotkey für die Sektorkarte auf eigenen Schiffen durch einen kontextsensitiven Kommando-Hotkey (und entfernt die Skunk von der Reparatur-Platform - für bessere Übersicht)" author="UniTrader">
+    <info site="forum.egosoft.com" url="http://forum.egosoft.com/viewtopic.php?t=379177" />
+  </text>
+</content>

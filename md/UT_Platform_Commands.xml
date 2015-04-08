@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="UT_Platform_Commands" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
+  <cues>
+    <cue name="TEST_SHIP">
+      <conditions>
+        <event_player_opened_crate comment="just something random to avoid the 'nonevent condition'-Error" />
+        <check_value value="false" comment="Cue deactivated :P just for me for Testing :P" />
+      </conditions>
+      <delay exact="3s"/>
+      <actions>
+        <create_ship name="$ship" macro="macro.units_size_xl_capital_destroyer_2_macro" zone="player.zone">
+          <owner exact="faction.player"/>
+          <pilot macro="character_split_m_a_macro">
+            <owner exact="faction.player"/>
+            <skills>
+              <skill type="boarding" exact="5"/>
+              <skill type="combat" exact="5"/>
+              <skill type="engineering" exact="5"/>
+              <skill type="leadership" exact="5"/>
+              <skill type="management" exact="5"/>
+              <skill type="morale" exact="5"/>
+              <skill type="navigation" exact="5"/>
+              <skill type="science" exact="5"/>
+            </skills>
+          </pilot>
+          <engineer macro="character_split_m_a_macro">
+            <owner exact="faction.player"/>
+            <skills>
+              <skill type="boarding" exact="5"/>
+              <skill type="combat" exact="5"/>
+              <skill type="engineering" exact="5"/>
+              <skill type="leadership" exact="5"/>
+              <skill type="management" exact="5"/>
+              <skill type="morale" exact="5"/>
+              <skill type="navigation" exact="5"/>
+              <skill type="science" exact="5"/>
+            </skills>
+          </engineer>
+          <defence macro="character_split_m_a_macro">
+            <owner exact="faction.player"/>
+            <skills>
+              <skill type="boarding" exact="5"/>
+              <skill type="combat" exact="5"/>
+              <skill type="engineering" exact="5"/>
+              <skill type="leadership" exact="5"/>
+              <skill type="management" exact="5"/>
+              <skill type="morale" exact="5"/>
+              <skill type="navigation" exact="5"/>
+              <skill type="science" exact="5"/>
+            </skills>
+          </defence>
+          <cargo>
+            <wares list="[ware.fuelcells]">
+              <fillpercent exact="100"/>
+            </wares>
+          </cargo>
+          <orientation orientation="look_at" refposition="position.[0m,0m,0m]"/>
+          <safepos x="0m" y="0m" z="-10km" radius="2km"/>
+        </create_ship>
+        <add_to_player_squad object="$ship"/>
+      </actions>
+    </cue>
+    <cue name="Ship_Docked">
+      <conditions>
+        <event_object_changed_room object="player.entity"/>
+        <check_value value="player.entity.container.isclass.ship and player.controlled != player.primaryship and player.entity.container.owner == faction.player"/>
+      </conditions>
+      <actions>
+        <reset_cue cue="Player_Undocked"/>
+      </actions>
+      <cues>
+        <cue name="Ship_On_Hotkey_Press" instantiate="true">
+          <conditions>
+            <event_cue_signalled cue="this"/>
+          </conditions>
+          <actions>
+            <start_conversation actor="player.computer" conversation="Ship_Action_Conversation"/>
+          </actions>
+        </cue>
+        <cue name="Ship_Action_Conservation" instantiate="true">
+          <conditions>
+            <check_any>
+              <event_conversation_started conversation="Ship_Action_Conversation"/>
+              <event_conversation_next_section sectionprefix="PC_"/>
+            </check_any>
+          </conditions>
+          <actions>
+            <do_if value="event.name =='event_conversation_started'">
+              <!-- Get Objects in the Line-of-Sight of the Player -->
+              <find_object name="$Objects" space="player.zone" multiple="true">
+                <match_is_in_view_of object="player.entity" vertical="5deg" horizontal="5deg"/>
+                <match_distance object="player.ship" max="player.ship.maxradarrange"/>
+              </find_object>
+              <find_zone name="$Zones" space="player.sector" multiple="true" known="true" tempzone="false" priorityzone="true">
+                <match_is_in_view_of object="player.entity" vertical="20deg" horizontal="20deg"/>
+              </find_zone>
+              <find_sector name="$Sectors" space="player.cluster" multiple="true" known="true">
+                <match_is_in_view_of object="player.entity" vertical="25deg" horizontal="25deg"/>
+              </find_sector>
+              <!-- Create Point where the Player looks to -->
+              <transform_position name="$Position" refposition="player.ship.position" refrotation="player.entity.rotation">
+                <position x="0m" y="0m" z="player.ship.maxradarrange"/>
+              </transform_position>
+              <!-- merge Zones and Sectors List - both shouldnt be too full -->
+              <do_all exact="$Sectors.count" counter="$i">
+                <append_to_list name="$Zones" exact="$Sectors.{$i}"/>
+              </do_all>
+              <!-- exclude current Object, current Zone and current Sector from List -->
+              <do_if value="$Objects.indexof.{player.entity.container}">
+                <remove_value name="$Objects.{$Objects.indexof.{player.entity.container}}"/>
+              </do_if>
+              <do_if value="$Zones.indexof.{player.zone}">
+                <remove_value name="$Zones.{$Zones.indexof.{player.zone}}"/>
+              </do_if>
+              <do_if value="$Zones.indexof.{player.sector}">
+                <remove_value name="$Zones.{$Zones.indexof.{player.sector}}"/>
+              </do_if>
+              <!-- Sort found Objects into categories -->
+              <create_list name="$Enemies"/>
+              <create_list name="$Moveables"/>
+              <create_list name="$Unmoveables"/>
+              <do_all exact="$Objects.count" counter="$i">
+                <do_if value="$Objects.{$i}.hasrelation.enemy.{faction.player}">
+                  <!-- insert Big Objects first into the List so small flys are at the End and possibly omitted from the Selection -->
+                  <do_if value="$Objects.{$i}.isclass.station or $Objects.{$i}.isclass.ship_xl or $Objects.{$i}.isclass.ship_l">
+                    <set_value name="$Enemies.{1}" operation="insert" exact="$Objects.{$i}"/>
+                  </do_if>
+                  <do_else>
+                    <append_to_list name="$Enemies" exact="$Objects.{$i}"/>
+                  </do_else>
+                </do_if>
+                <do_if value="$Objects.{$i}.isclass.ship">
+                  <!-- insert Big Objects first into the List so small flys are at the End and possibly omitted from the Selection -->
+                  <do_if value="$Objects.{$i}.isclass.ship_xl or $Objects.{$i}.isclass.ship_l">
+                    <set_value name="$Moveables.{1}" operation="insert" exact="$Objects.{$i}"/>
+                  </do_if>
+                  <do_else>
+                    <append_to_list name="$Moveables" exact="$Objects.{$i}"/>
+                  </do_else>
+                </do_if>
+                <do_if value="$Objects.{$i}.isclass.station or $Objects.{$i}.isclass.asteroid">
+                  <append_to_list name="$Unmoveables" exact="$Objects.{$i}"/>
+                </do_if>
+                <!-- in case of a Gate add its Destination Zone to the Zone List instead of sorting it somewhere else (except for Inactive Gates) -->
+                <do_if value="$Objects.{$i}.isclass.gate and $Objects.{$i}.destination.exists">
+                  <append_to_list name="$Zones" exact="$Objects.{$i}.destination"/>
+                </do_if>
+              </do_all>
+              <!-- Option for Follow Moveable Objects WiP - for now only Fly to-->
+              <do_if value="$Moveables.count == 1">
+                <add_player_choice position="1" text="'%1k %2'.[(($Moveables.{1}.distanceto.{player.ship})/1000)i,$Moveables.{1}.name]" section="PC_Move_Follow_selected" choiceparam="$Moveables.{1}"/>
+              </do_if>
+              <do_else>
+                <add_player_choice position="1" text="'Follow: %1 targets found'.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
+              </do_else>
+              <add_player_choice position="2" text="'%1   Stop Orders'.[$Objects.count + $Zones.count]" section="PC_Stop"/>
+              <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
+              <do_if value="$Enemies.count == 1">
+                <add_player_choice position="3" text="'\033R%1k %2\033X'.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}"/>
+              </do_if>
+              <do_elseif value="$Enemies.count == 0 and $Objects.count ge 1">
+                <add_player_choice position="3" text="'\033RAttack: \033B%1 targets\033X'.[$Objects.count]" section="PC_Move_Attack_friendlies" choiceparam="$Objects"/>
+              </do_elseif>
+              <do_else>
+                <add_player_choice position="3" text="'\033RAttack: %1 targets found\033X'.[$Enemies.count]" section="PC_Move_Attack" choiceparam="$Enemies" selectable="$Enemies.count"/>
+              </do_else>
+              <!-- Option for Fly to Zone-Command -->
+              <do_if value="$Zones.count == 1">
+                <do_if value="$Zones.{1}.distanceto.{player.ship} ge 1000000m">
+                  <add_player_choice position="4" text="'%1M %2'.[(($Zones.{1}.distanceto.{player.ship})/1000000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
+                </do_if>
+                <do_else>
+                  <add_player_choice position="4" text="'%1k %2'.[(($Zones.{1}.distanceto.{player.ship})/1000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
+                </do_else>
+              </do_if>
+              <do_else>
+                <add_player_choice position="4" text="'Fly to: %1 found'.[$Zones.count]" section="PC_Move_FlyTo" choiceparam="$Zones" selectable="$Zones.count"/>
+              </do_else>
+              <!-- Option for Fly to (unmoveable) Object -->
+              <do_if value="$Unmoveables.count == 1">
+                <add_player_choice position="5" text="'%1k %2'.[(($Unmoveables.{1}.distanceto.{player.ship})/1000)i,$Unmoveables.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Unmoveables.{1}"/>
+              </do_if>
+              <do_else>
+                <add_player_choice position="5" text="'Fly to: %1 Objects found'.[$Unmoveables.count]" section="PC_Move_FlyTo" choiceparam="$Unmoveables" selectable="$Unmoveables.count"/>
+              </do_else>
+              <!-- If player can see whats happening in the specified Direction add order to Fly in Looking Direction, otherwise (if he looks to his Feet or, with Bridge Mod, behind in the Wall) add Order to Turn/roll the Ship -->
+              <do_if value="true" comment="Move Ship">
+                <!-- player.entity.rotation.pitch gt -45deg -->
+                <!-- and -180 lt player.entitiy.rotation.yaw lt 180 -->
+                <add_player_choice position="6" text="'Fly %1km in this direction'.[(player.ship.maxradarrange)/1000]" section="PC_Move_FlyToPos" choiceparam="$Position"/>
+              </do_if>
+              <do_else comment="player.entity.rotation.pitch gt 45deg">
+                <add_player_choice position="6" text="'Do a Barrel Roll'" section="PC_Move_BarrelRoll"/>
+              </do_else>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+              <!--do_else comment="Turn Ship Around">
+                <add_player_choice position="6" text="'Turn Ship around'" section="PC_Move_TurnAround"/>
+              </do_else-->
+            </do_if>
+            <do_elseif value="event.param == 'PC_Move_Follow_selected'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <!-- ToDo: make this to a follow -->
+              <signal_objects object="player.ship" param="'follow'" param2="event.param2" delay="100ms"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_Follow'">
+              <do_all exact="[event.param2.count,6].min" counter="$i">
+                <add_player_choice position="$i" text="'%1k %2'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Follow_selected" choiceparam="event.param2.{$i}"/>
+              </do_all>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Stop'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_Attack_selected'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'attack object'" param2="event.param2" delay="100ms"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_Attack'">
+              <do_all exact="[event.param2.count,6].min" counter="$i">
+                <add_player_choice position="$i" text="'\033R%1k %2\033X'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
+              </do_all>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_Attack_friendlies'">
+              <add_npc_line speaker="player.computer" line="5000" comment="Attention! Target is not hostile."/>
+              <do_all exact="[event.param2.count,6].min" counter="$i">
+                <add_player_choice position="$i" text="'\033R%1033B %2\033X'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
+              </do_all>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_FlyTo_selected'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'fly to'" param2="event.param2" delay="100ms"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_FlyTo'">
+              <do_all exact="[event.param2.count,6].min" counter="$i">
+                <do_if value="event.param2.{$i}.distanceto.{player.ship} ge 1000000m">
+                  <add_player_choice position="$i" text="'%1M %2'.[((event.param2.{$i}.distanceto.{player.ship})/1000000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
+                </do_if>
+                <do_else>
+                  <add_player_choice position="$i" text="'%1k %2'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
+                </do_else>
+              </do_all>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_FlyToPos'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'fly to pos'" param2="event.param2"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_BarrelRoll'">
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <transform_position name="$Position" refposition="player.ship.position" refrotation="player.ship.rotation">
+                <position x="0m" y="0m" z="500m"/>
+              </transform_position>
+              <create_rotation name="$Rotation" yaw="player.ship.rotation.yaw" pitch="player.ship.rotation.pitch" roll="player.ship.rotation.roll+180deg"/>
+              <signal_objects object="player.ship" param="'fly to pos'" param2="$Position" param3="$Rotation" delay="100ms"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_TurnAround'">
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'rotate'" param2="rotation.[player.ship.rotation.yaw+180deg,player.ship.rotation.pitch,player.ship.rotation.roll]" delay="100ms"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Exit'">
+              <cancel_conversation/>
+            </do_elseif>
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+    <cue name="Player_Undocked" comment="Player Undocked: stop Platform Scripts and reset cue for player wait until docked again">
+      <conditions>
+        <event_object_changed_room object="player.entity"/>
+        <check_value exact="player.entity.container" value="player.primaryship" comment="Only if player is on his ship"/>
+      </conditions>
+      <actions>
+        <reset_cue cue="Ship_Docked"/>
+      </actions>
+    </cue>
+  </cues>
+</mdscript>
