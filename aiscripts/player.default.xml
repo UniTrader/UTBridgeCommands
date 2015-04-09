@@ -14,7 +14,6 @@
       <run_interrupt_script name="'command.move.pos'" abortscripts="true" resume="init">
         <param name="destination" value="player.ship.zone"/>
         <param name="position" value="event.param2"/>
-        <param name="rotation" value="player.entity.rotation"/>
       </run_interrupt_script>
     </do_elseif>
   </add>

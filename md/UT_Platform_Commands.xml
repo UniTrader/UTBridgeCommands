@@ -3,10 +3,9 @@
   <cues>
     <cue name="TEST_SHIP">
       <conditions>
-        <event_player_opened_crate comment="just something random to avoid the 'nonevent condition'-Error" />
-        <check_value value="false" comment="Cue deactivated :P just for me for Testing :P" />
+        <event_player_cycled_weapons comment="just something random to avoid the 'nonevent condition'-Error"/>
+        <check_value value="false" comment="Cue deactivated :P just for me for Testing :P"/>
       </conditions>
-      <delay exact="3s"/>
       <actions>
         <create_ship name="$ship" macro="macro.units_size_xl_capital_destroyer_2_macro" zone="player.zone">
           <owner exact="faction.player"/>
@@ -86,40 +85,59 @@
           </conditions>
           <actions>
             <do_if value="event.name =='event_conversation_started'">
-              <!-- Get Objects in the Line-of-Sight of the Player -->
-              <find_object name="$Objects" space="player.zone" multiple="true">
-                <match_is_in_view_of object="player.entity" vertical="5deg" horizontal="5deg"/>
-                <match_distance object="player.ship" max="player.ship.maxradarrange"/>
-              </find_object>
+              <!--========================================-->
+              <!--=========== Find possible Targets ===========-->
+              <!--========================================-->
+              <!-- Sector/Zone Targets - note: Clusters may be Added by Object Search for Gates in the next part, too-->
               <find_zone name="$Zones" space="player.sector" multiple="true" known="true" tempzone="false" priorityzone="true">
                 <match_is_in_view_of object="player.entity" vertical="20deg" horizontal="20deg"/>
               </find_zone>
               <find_sector name="$Sectors" space="player.cluster" multiple="true" known="true">
                 <match_is_in_view_of object="player.entity" vertical="25deg" horizontal="25deg"/>
               </find_sector>
-              <!-- Create Point where the Player looks to -->
-              <transform_position name="$Position" refposition="player.ship.position" refrotation="player.entity.rotation">
-                <position x="0m" y="0m" z="player.ship.maxradarrange"/>
-              </transform_position>
               <!-- merge Zones and Sectors List - both shouldnt be too full -->
               <do_all exact="$Sectors.count" counter="$i">
                 <append_to_list name="$Zones" exact="$Sectors.{$i}"/>
               </do_all>
-              <!-- exclude current Object, current Zone and current Sector from List -->
-              <do_if value="$Objects.indexof.{player.entity.container}">
-                <remove_value name="$Objects.{$Objects.indexof.{player.entity.container}}"/>
-              </do_if>
+              <!-- remove Player Zone and Cluster in case he got it by chance -->
               <do_if value="$Zones.indexof.{player.zone}">
                 <remove_value name="$Zones.{$Zones.indexof.{player.zone}}"/>
               </do_if>
               <do_if value="$Zones.indexof.{player.sector}">
                 <remove_value name="$Zones.{$Zones.indexof.{player.sector}}"/>
               </do_if>
+              <!--========================================-->
+              <!-- Get Zone Objects in the view of the Player (everything except Stations)-->
+              <find_object name="$Objects" space="player.zone" multiple="true">
+                <match_is_in_view_of object="player.entity" vertical="5deg" horizontal="5deg"/>
+                <match_distance object="player.ship" max="player.ship.maxradarrange"/>
+                <match class="class.station" negate="true"/>
+              </find_object>
+              <!-- Fallback for Stations: Find Object with a huge Angle because -->
+                <find_object name="$Stations" space="player.zone" multiple="true" class="class.station">
+                  <match_is_in_view_of object="player.entity" vertical="25deg" horizontal="25deg"/>
+                </find_object>
+                <do_all exact="$Stations.count" counter="$i">
+                  <append_to_list name="$Objects" exact="$Stations.{$i}"/>
+                </do_all>
+              <!-- Code Snippet to add Sub-Components to the Target List - under Consideration
+                <find_object_component name="$components" class="class.destructible" multiple="true" object="$Objects.{$Objects.count}" comment="Last Object in the List because it must have been added by the previous Loop"/>
+                <do_all exact="$components.count" counter="$i">
+                  <check_line_of_sight name="$result" object="player.entity" target="$components.{$i}"/>
+                  <do_if value="$result">
+                    <append_to_list name="$Objects" exact="$components.{$i}"/>
+                  </do_if>
+                </do_all>-->
+              <!-- exclude current Player Object -->
+              <do_if value="$Objects.indexof.{player.entity.container}">
+                <remove_value name="$Objects.{$Objects.indexof.{player.entity.container}}"/>
+              </do_if>
               <!-- Sort found Objects into categories -->
               <create_list name="$Enemies"/>
               <create_list name="$Moveables"/>
               <create_list name="$Unmoveables"/>
               <do_all exact="$Objects.count" counter="$i">
+                <!-- Enemy Objects (Attack) -->
                 <do_if value="$Objects.{$i}.hasrelation.enemy.{faction.player}">
                   <!-- insert Big Objects first into the List so small flys are at the End and possibly omitted from the Selection -->
                   <do_if value="$Objects.{$i}.isclass.station or $Objects.{$i}.isclass.ship_xl or $Objects.{$i}.isclass.ship_l">
@@ -129,6 +147,7 @@
                     <append_to_list name="$Enemies" exact="$Objects.{$i}"/>
                   </do_else>
                 </do_if>
+                <!-- Ships (Follow) -->
                 <do_if value="$Objects.{$i}.isclass.ship">
                   <!-- insert Big Objects first into the List so small flys are at the End and possibly omitted from the Selection -->
                   <do_if value="$Objects.{$i}.isclass.ship_xl or $Objects.{$i}.isclass.ship_l">
@@ -138,7 +157,8 @@
                     <append_to_list name="$Moveables" exact="$Objects.{$i}"/>
                   </do_else>
                 </do_if>
-                <do_if value="$Objects.{$i}.isclass.station or $Objects.{$i}.isclass.asteroid">
+                <!-- Stations -->
+                <do_if value="$Objects.{$i}.isclass.station">
                   <append_to_list name="$Unmoveables" exact="$Objects.{$i}"/>
                 </do_if>
                 <!-- in case of a Gate add its Destination Zone to the Zone List instead of sorting it somewhere else (except for Inactive Gates) -->
@@ -146,13 +166,20 @@
                   <append_to_list name="$Zones" exact="$Objects.{$i}.destination"/>
                 </do_if>
               </do_all>
-              <!-- Option for Follow Moveable Objects WiP - for now only Fly to-->
+              <!--========================================-->
+              <!-- Save Direction the Player looks to for Move to Pos-Command-->
+              <set_value name="$PlayerDirection" exact="[ player.entity.rotation , player.ship.rotation ]"/>
+              <!--========================================-->
+              <!-- Create Possible Interactions Menu from Targets -->
+              <!--========================================-->
+              <!-- Follow Target -->
               <do_if value="$Moveables.count == 1">
                 <add_player_choice position="1" text="'%1k %2'.[(($Moveables.{1}.distanceto.{player.ship})/1000)i,$Moveables.{1}.name]" section="PC_Move_Follow_selected" choiceparam="$Moveables.{1}"/>
               </do_if>
               <do_else>
                 <add_player_choice position="1" text="'Follow: %1 targets found'.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
               </do_else>
+              <!-- Abort Commands -->
               <add_player_choice position="2" text="'%1   Stop Orders'.[$Objects.count + $Zones.count]" section="PC_Stop"/>
               <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
               <do_if value="$Enemies.count == 1">
@@ -183,58 +210,67 @@
               <do_else>
                 <add_player_choice position="5" text="'Fly to: %1 Objects found'.[$Unmoveables.count]" section="PC_Move_FlyTo" choiceparam="$Unmoveables" selectable="$Unmoveables.count"/>
               </do_else>
-              <!-- If player can see whats happening in the specified Direction add order to Fly in Looking Direction, otherwise (if he looks to his Feet or, with Bridge Mod, behind in the Wall) add Order to Turn/roll the Ship -->
+              <!-- Fly in specified Direction -->
               <do_if value="true" comment="Move Ship">
                 <!-- player.entity.rotation.pitch gt -45deg -->
                 <!-- and -180 lt player.entitiy.rotation.yaw lt 180 -->
-                <add_player_choice position="6" text="'Fly %1km in this direction'.[(player.ship.maxradarrange)/1000]" section="PC_Move_FlyToPos" choiceparam="$Position"/>
+                <add_player_choice position="6" text="'Fly in this direction'" section="PC_Move_FlyToPos" choiceparam="$PlayerDirection"/>
               </do_if>
               <do_else comment="player.entity.rotation.pitch gt 45deg">
                 <add_player_choice position="6" text="'Do a Barrel Roll'" section="PC_Move_BarrelRoll"/>
               </do_else>
-              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
               <!--do_else comment="Turn Ship Around">
                 <add_player_choice position="6" text="'Turn Ship around'" section="PC_Move_TurnAround"/>
               </do_else-->
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_if>
+            <!-- Follow Target -->
             <do_elseif value="event.param == 'PC_Move_Follow_selected'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
-              <!-- ToDo: make this to a follow -->
               <signal_objects object="player.ship" param="'follow'" param2="event.param2" delay="100ms"/>
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Follow'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
                 <add_player_choice position="$i" text="'%1k %2'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Follow_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
+              <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
+            <!-- Stop Command -->
             <do_elseif value="event.param == 'PC_Stop'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
             </do_elseif>
+            <!-- Attack Target -->
             <do_elseif value="event.param == 'PC_Move_Attack_selected'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'attack object'" param2="event.param2" delay="100ms"/>
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Attack'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
                 <add_player_choice position="$i" text="'\033R%1k %2\033X'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
+              <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Attack_friendlies'">
               <add_npc_line speaker="player.computer" line="5000" comment="Attention! Target is not hostile."/>
               <do_all exact="[event.param2.count,6].min" counter="$i">
-                <add_player_choice position="$i" text="'\033R%1033B %2\033X'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
+                <add_player_choice position="$i" text="'\033R%1 \033B%2\033X'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
+              <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
+            <!-- Fly to Target -->
             <do_elseif value="event.param == 'PC_Move_FlyTo_selected'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'fly to'" param2="event.param2" delay="100ms"/>
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_FlyTo'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
@@ -245,12 +281,29 @@
                   <add_player_choice position="$i" text="'%1k %2'.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
                 </do_else>
               </do_all>
+              <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
+            <!-- Fly to Position / Rotate Ship -->
             <do_elseif value="event.param == 'PC_Move_FlyToPos'">
+              <set_value name="$DistanceList" exact="[-5km,5km,15km,50km,150km,500km]"/>
+              <do_all exact="$DistanceList.count" counter="$i">
+                <!-- first calculate the Target Pos relative to the Ship in its Coordinate System, then apply Ship Rotation to it to get the Zone Position -->
+                <transform_position name="$Position" refposition="position.[0,0,0]" refrotation="event.param2.{1}">
+                  <position x="0m" y="0m" z="$DistanceList.{$i}"/>
+                </transform_position>
+                <transform_position name="$Position" refposition="player.ship.position" refrotation="event.param2.{2}">
+                  <position value="$Position"/>
+                </transform_position>
+                <add_player_choice position="$i" text="'for %1km'.[($DistanceList.{$i}/1000)i]" section="PC_Move_FlyToPos_selected" choiceparam="$Position"/>
+              </do_all>
+              <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Move_FlyToPos_selected'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'fly to pos'" param2="event.param2"/>
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_BarrelRoll'">
               <include_actions ref="md.Orders.StopCurrentTask"/>
@@ -264,6 +317,7 @@
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'rotate'" param2="rotation.[player.ship.rotation.yaw+180deg,player.ship.rotation.pitch,player.ship.rotation.roll]" delay="100ms"/>
             </do_elseif>
+            <!-- Exit Condition - always bound to Escape Conversation-Key (and Item 6 if not already used otherwise)-->
             <do_elseif value="event.param == 'PC_Exit'">
               <cancel_conversation/>
             </do_elseif>

@@ -3,6 +3,7 @@
   <replace sel="//cue[@name=&quot;SectorMapStarted&quot;]/actions">
     <actions>
       <do_if value="player.entity.container.isclass.ship and player.controlled != player.primaryship and player.entity.container.owner == faction.player">
+        <cancel_conversation actor="player.copilot" />
         <signal_cue cue="md.UT_Platform_Commands.Ship_On_Hotkey_Press"/>
       </do_if>
       <!-- redirect Sectormap Hotkey only when on a Bridge - otherwise Vanilla behavior -->
