@@ -174,16 +174,16 @@
               <!--========================================-->
               <!-- Follow Target -->
               <do_if value="$Moveables.count == 1">
-                <add_player_choice position="1" text="{5554102,11}.[(($Moveables.{1}.distanceto.{player.ship})/1000)i,$Moveables.{1}.name]" section="PC_Move_Follow_selected" choiceparam="$Moveables.{1}"/>
+                <add_player_choice position="1" text="{5554102,31}.[(($Moveables.{1}.distanceto.{player.ship})/1000)i,$Moveables.{1}.name]" section="PC_Move_Follow_selected" choiceparam="$Moveables.{1}"/>
               </do_if>
               <do_else>
-                <add_player_choice position="1" text="{5554102,1}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
+                <add_player_choice position="1" text="{5554102,3}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
               </do_else>
               <!-- Abort Commands -->
-              <add_player_choice position="2" text="{5554102,2}.[$Objects.count + $Zones.count]" section="PC_Stop"/>
+              <add_player_choice position="2" text="{5554102,4}.[$Objects.count + $Zones.count]" section="PC_Stop"/>
               <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
               <do_if value="$Enemies.count == 1">
-                <add_player_choice position="3" text="{5554102,13}.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}"/>
+                <add_player_choice position="3" text="{5554102,33}.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}"/>
               </do_if>
               <do_elseif value="$Enemies.count == 0 and $Objects.count ge 1">
                 <add_player_choice position="3" text="{5554102,7}.[$Objects.count]" section="PC_Move_Attack_friendlies" choiceparam="$Objects"/>
@@ -194,10 +194,10 @@
               <!-- Option for Fly to Zone-Command -->
               <do_if value="$Zones.count == 1">
                 <do_if value="$Zones.{1}.distanceto.{player.ship} ge 1000000m">
-                  <add_player_choice position="4" text="{5554102,20}.[(($Zones.{1}.distanceto.{player.ship})/1000000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
+                  <add_player_choice position="4" text="{5554102,40}.[(($Zones.{1}.distanceto.{player.ship})/1000000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
                 </do_if>
                 <do_else>
-                  <add_player_choice position="4" text="{5554102,18}.[(($Zones.{1}.distanceto.{player.ship})/1000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
+                  <add_player_choice position="4" text="{5554102,38}.[(($Zones.{1}.distanceto.{player.ship})/1000)i,$Zones.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Zones.{1}"/>
                 </do_else>
               </do_if>
               <do_else>
@@ -205,7 +205,7 @@
               </do_else>
               <!-- Option for Fly to (unmoveable) Object -->
               <do_if value="$Unmoveables.count == 1">
-                <add_player_choice position="5" text="{5554102,18}.[(($Unmoveables.{1}.distanceto.{player.ship})/1000)i,$Unmoveables.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Unmoveables.{1}"/>
+                <add_player_choice position="5" text="{5554102,38}.[(($Unmoveables.{1}.distanceto.{player.ship})/1000)i,$Unmoveables.{1}.name]" section="PC_Move_FlyTo_selected" choiceparam="$Unmoveables.{1}"/>
               </do_if>
               <do_else>
                 <add_player_choice position="5" text="{5554102,5}.[$Unmoveables.count]" section="PC_Move_FlyTo" choiceparam="$Unmoveables" selectable="$Unmoveables.count"/>
@@ -233,7 +233,7 @@
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Follow'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
-                <add_player_choice position="$i" text="{5554102,11}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Follow_selected" choiceparam="event.param2.{$i}"/>
+                <add_player_choice position="$i" text="{5554102,31}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Follow_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
               <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
@@ -252,7 +252,7 @@
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Attack'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
-                <add_player_choice position="$i" text="{5554102,13}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
+                <add_player_choice position="$i" text="{5554102,33}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
               <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
@@ -260,7 +260,7 @@
             <do_elseif value="event.param == 'PC_Move_Attack_friendlies'">
               <add_npc_line speaker="player.computer" line="5000" comment="Attention! Target is not hostile."/>
               <do_all exact="[event.param2.count,6].min" counter="$i">
-                <add_player_choice position="$i" text="{5554102,15}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
+                <add_player_choice position="$i" text="{5554102,35}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
               <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
@@ -275,10 +275,10 @@
             <do_elseif value="event.param == 'PC_Move_FlyTo'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
                 <do_if value="event.param2.{$i}.distanceto.{player.ship} ge 1000000m">
-                  <add_player_choice position="$i" text="{5554102,19}.[((event.param2.{$i}.distanceto.{player.ship})/1000000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
+                  <add_player_choice position="$i" text="{5554102,39}.[((event.param2.{$i}.distanceto.{player.ship})/1000000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
                 </do_if>
                 <do_else>
-                  <add_player_choice position="$i" text="{5554102,17}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
+                  <add_player_choice position="$i" text="{5554102,37}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_FlyTo_selected" choiceparam="event.param2.{$i}"/>
                 </do_else>
               </do_all>
               <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
@@ -295,7 +295,7 @@
                 <transform_position name="$Position" refposition="player.ship.position" refrotation="event.param2.{2}">
                   <position value="$Position"/>
                 </transform_position>
-                <add_player_choice position="$i" text="{5554102,23}.[($DistanceList.{$i}/1000)i]" section="PC_Move_FlyToPos_selected" choiceparam="$Position"/>
+                <add_player_choice position="$i" text="{5554102,43}.[($DistanceList.{$i}/1000)i]" section="PC_Move_FlyToPos_selected" choiceparam="$Position"/>
               </do_all>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>

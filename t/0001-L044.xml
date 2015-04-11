@@ -19,25 +19,29 @@ no definite Scheme yet.
   <t id="5">Fly to: %1 Targets found</t>
   <t id="6">Fly in this Direction</t>
   <t id="7">\033RAttack: \033B%1 Targets found\033X</t>
+  <!-- Advanced Commands (Slot 2) -->
+  
+  <!-- Station Commands (Slot5) - not implemented yet -->
+  
   <!-- Follow Selection Entries (currently no Coloring) -->
-  <t id="11">%1k %2</t><!-- left -->
-  <t id="12">%2 %1k</t><!-- right (not used yet)-->
+  <t id="31">%1k %2</t><!-- left -->
+  <t id="32">%2 %1k</t><!-- right (not used yet)-->
   <!-- Attack Selection Entries (red Coloring; red/blue for Friendlies)-->
-  <t id="13">\033R%1k %2\033X</t>
-  <t id="14">\033R%2 %1k\033X</t>
-  <t id="15">\033R%1k \033B%2\033X</t>
-  <t id="16">\033B%2\033R %1k\033X</t>
+  <t id="33">\033R%1k %2\033X</t>
+  <t id="34">\033R%2 %1k\033X</t>
+  <t id="35">\033R%1k \033B%2\033X</t>
+  <t id="36">\033B%2\033R %1k\033X</t>
   <!-- Fly to Zone/Sector Selection Entries (currently no Coloring) - shared with Fly To Station until Station-Specific Stuff is implemented
   kilometers / Megameters / Gigameters (last currently unused)-->
-  <t id="17">%1k %2</t>
-  <t id="18">%2 %1k</t>
-  <t id="19">%1M %2</t>
-  <t id="20">%2 %1M</t>
-  <t id="21">%1G %2</t>
-  <t id="22">%2 %1G</t>
+  <t id="37">%1k %2</t>
+  <t id="38">%2 %1k</t>
+  <t id="39">%1M %2</t>
+  <t id="40">%2 %1M</t>
+  <t id="41">%1G %2</t>
+  <t id="42">%2 %1G</t>
   <!-- Fly to Position Entries (currently no Coloring) - note that Entry 1 is for 5km backwards -->
-  <t id="23">f0r %1km</t>
-  <t id="24">f0r %1km(NO BOOST YET!)</t>
+  <t id="43">f0r %1km</t>
+  <t id="44">f0r %1km(NO BOOST YET!)</t>
   <!-- Fly to Station Entries (currently no Coloring) - will be replaced by Station-Specific orders at some point -->
 </page>
 </language>
