@@ -42,8 +42,7 @@ no definite Scheme yet.
   <t id="41">%1G %2</t>
   <t id="42">%2 %1G</t>
   <!-- Fly to Position Entries (currently no Coloring) - note that Entry 1 is for 5km backwards -->
-  <t id="43">f0r %1km</t>
-  <t id="44">f0r %1km(NO BOOST YET!)</t>
-  <!-- Fly to Station Entries (currently no Coloring) - will be replaced by Station-Specific orders at some point -->
+  <t id="43">for %1km</t>
+  <t id="44">for %1km(NO BOOST YET!)</t>
 </page>
 </language>

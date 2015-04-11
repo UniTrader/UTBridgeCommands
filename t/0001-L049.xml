@@ -44,6 +44,5 @@ no definite Scheme yet.
   <!-- Fly to Position Entries (currently no Coloring) - note that Entry 1 is for 5km backwards -->
   <t id="43">für %1km</t>
   <t id="44">für %1km(NOCH OHNE BOOST!)</t>
-  <!-- Fly to Station Entries (currently no Coloring) - will be replaced by Station-Specific orders at some point -->
 </page>
 </language>
