@@ -179,17 +179,16 @@
               <do_else>
                 <add_player_choice position="1" text="{5554102,3}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
               </do_else>
-              <!-- Abort Commands -->
-              <add_player_choice position="2" text="{5554102,4}.[$Objects.count + $Zones.count]" section="PC_Stop"/>
+              <add_player_choice position="2" text="{5554102,4}.[$Objects.count + $Zones.count]" section="PC_Advanced"/>
               <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
               <do_if value="$Enemies.count == 1">
-                <add_player_choice position="3" text="{5554102,33}.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}"/>
+                <add_player_choice position="3" text="{5554102,33}.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
               </do_if>
               <do_elseif value="$Enemies.count == 0 and $Objects.count ge 1">
-                <add_player_choice position="3" text="{5554102,7}.[$Objects.count]" section="PC_Move_Attack_friendlies" choiceparam="$Objects"/>
+                <add_player_choice position="3" text="{5554102,7}.[$Objects.count]" section="PC_Move_Attack_friendlies" choiceparam="$Objects" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
               </do_elseif>
               <do_else>
-                <add_player_choice position="3" text="{5554102,3}.[$Enemies.count]" section="PC_Move_Attack" choiceparam="$Enemies" selectable="$Enemies.count"/>
+                <add_player_choice position="3" text="{5554102,3}.[$Enemies.count]" section="PC_Move_Attack" choiceparam="$Enemies" selectable="$Enemies.count and player.ship.dps.all" comment="only for Ships which are armed"/>
               </do_else>
               <!-- Option for Fly to Zone-Command -->
               <do_if value="$Zones.count == 1">
@@ -238,10 +237,36 @@
               <add_player_choice position="6" text="'Exit'" section="PC_Exit"/>
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
-            <!-- Stop Command -->
-            <do_elseif value="event.param == 'PC_Stop'">
+            <!-- Advanced Commands (Independent of Target -->
+            <do_elseif value="event.param == 'PC_Advanced'">
+              <add_player_choice position="1" text="{5554102,1}" section="PC_Hold_Position"/>
+              <add_player_choice position="2" text="{5554102,2}" section="PC_Follow_me"/>
+              <add_player_choice position="3" text="{5554102,3}" section="PC_Withdraw"/>
+              <add_player_choice position="4" text="{5554102,4}" section="PC_Patrol Zone" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Hold_Position'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'hold position'" delay="100ms" />
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1017,1017].random" comment="confirmation hold pos" />
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Follow_me'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1031,1031,2102,2102,1017,1017].random" comment="confirmation follow me" />
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Withdraw'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <signal_objects object="player.ship" param="'withdraw battle'" delay="100ms" />
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1057,1057].random" comment="confirmation withdraw" />
+            </do_elseif>
+            <do_elseif value="event.param == 'PC_Patrol_Zone'">
+              <cancel_conversation/>
+              <include_actions ref="md.Orders.StopCurrentTask"/>
+              <!-- param2 = zone, param3 = timeout -->
+              <signal_objects object="player.ship" param="'attack enemies'" param2="player.ship.zone" param3="null" delay="100ms" />
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1045,1045].random" comment="confirmation patrol" />
             </do_elseif>
             <!-- Attack Target -->
             <do_elseif value="event.param == 'PC_Move_Attack_selected'">
@@ -270,7 +295,7 @@
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'fly to'" param2="event.param2" delay="100ms"/>
-              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1032,1032,1081,1081].random" comment="confirmation move to" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_FlyTo'">
               <do_all exact="[event.param2.count,6].min" counter="$i">
@@ -303,7 +328,7 @@
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
               <signal_objects object="player.ship" param="'fly to pos'" param2="event.param2"/>
-              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019].random" comment="generic confirmation" />
+              <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1032,1032].random" comment="confirmation move to pos" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_BarrelRoll'">
               <include_actions ref="md.Orders.StopCurrentTask"/>
