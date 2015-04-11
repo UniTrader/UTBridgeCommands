@@ -179,6 +179,7 @@
               <do_else>
                 <add_player_choice position="1" text="{5554102,3}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
               </do_else>
+              <!-- Advanced Commands -->
               <add_player_choice position="2" text="{5554102,4}.[$Objects.count + $Zones.count]" section="PC_Advanced"/>
               <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
               <do_if value="$Enemies.count == 1">

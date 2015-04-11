@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<language>
+
+<!-- Naming Scheme: 5554 -> Hexadecimal Ascii for UT; 
+10 for Player choices;
+1 for Player Logo Extension
+2 for Bridge Commands Extension
+
+t ids:
+no definite Scheme yet.
+-->
+
+<page id="5554102" title="Bridge Commands" descr="Bridge Commands" voice="no">
+  <t id="0"></t>
+  <t id="1">Follow: %1 Targets found</t>
+  <t id="2">%1   Advanced Commands</t>
+  <t id="3">\033RAttack: %1 Targets found\033X</t>
+  <t id="4">Fly to: %1 Targets found</t>
+  <t id="5">Fly to: %1 Targets found</t>
+  <t id="6">Fly in this Direction</t>
+  <t id="7">\033RAttack: \033B%1 Targets found\033X</t>
+  <!-- Advanced Commands (Slot 2) -->
+  <t id="1">Hold Position</t>
+  <t id="2">Follow me</t>
+  <t id="3">Withdraw Battle</t>
+  <t id="4">Patrol Zone</t>  
+  <!-- Station Commands (Slot5) - not implemented yet -->
+  <!-- Follow Selection Entries (currently no Coloring) -->
+  <t id="31">%1k %2</t><!-- left -->
+  <t id="32">%2 %1k</t><!-- right (not used yet)-->
+  <!-- Attack Selection Entries (red Coloring; red/blue for Friendlies)-->
+  <t id="33">\033R%1k %2\033X</t>
+  <t id="34">\033R%2 %1k\033X</t>
+  <t id="35">\033R%1k \033B%2\033X</t>
+  <t id="36">\033B%2\033R %1k\033X</t>
+  <!-- Fly to Zone/Sector Selection Entries (currently no Coloring) - shared with Fly To Station until Station-Specific Stuff is implemented
+  kilometers / Megameters / Gigameters (last currently unused)-->
+  <t id="37">%1k %2</t>
+  <t id="38">%2 %1k</t>
+  <t id="39">%1M %2</t>
+  <t id="40">%2 %1M</t>
+  <t id="41">%1G %2</t>
+  <t id="42">%2 %1G</t>
+  <!-- Fly to Position Entries (currently no Coloring) - note that Entry 1 is for 5km backwards -->
+  <t id="43">f0r %1km</t>
+  <t id="44">f0r %1km(NO BOOST YET!)</t>
+  <!-- Fly to Station Entries (currently no Coloring) - will be replaced by Station-Specific orders at some point -->
+</page>
+</language>
