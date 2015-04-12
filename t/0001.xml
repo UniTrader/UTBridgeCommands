@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <language>
 
 <!-- Naming Scheme: 5554 -> Hexadecimal Ascii for UT; 
@@ -20,10 +20,10 @@ no definite Scheme yet.
   <t id="6">Fly in this Direction</t>
   <t id="7">\033RAttack: \033B%1 Targets found\033X</t>
   <!-- Advanced Commands (Slot 2) -->
-  <t id="1">Hold Position</t>
-  <t id="2">Follow me</t>
-  <t id="3">Withdraw Battle</t>
-  <t id="4">Patrol Zone</t>  
+  <t id="11">Hold Position</t>
+  <t id="12">Follow me</t>
+  <t id="13">Withdraw Battle</t>
+  <t id="14">Patrol Zone</t>  
   <!-- Station Commands (Slot5) - not implemented yet -->
   <!-- Follow Selection Entries (currently no Coloring) -->
   <t id="31">%1k %2</t><!-- left -->

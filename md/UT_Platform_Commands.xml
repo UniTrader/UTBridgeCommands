@@ -177,10 +177,10 @@
                 <add_player_choice position="1" text="{5554102,31}.[(($Moveables.{1}.distanceto.{player.ship})/1000)i,$Moveables.{1}.name]" section="PC_Move_Follow_selected" choiceparam="$Moveables.{1}"/>
               </do_if>
               <do_else>
-                <add_player_choice position="1" text="{5554102,3}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
+                <add_player_choice position="1" text="{5554102,1}.[$Moveables.count]" section="PC_Move_Follow" choiceparam="$Moveables" selectable="$Moveables.count"/>
               </do_else>
               <!-- Advanced Commands -->
-              <add_player_choice position="2" text="{5554102,4}.[$Objects.count + $Zones.count]" section="PC_Advanced"/>
+              <add_player_choice position="2" text="{5554102,2}.[$Objects.count + $Zones.count]" section="PC_Advanced"/>
               <!-- Option for Attacking Enemies - when no Enemies are in sight add Objects instead -->
               <do_if value="$Enemies.count == 1">
                 <add_player_choice position="3" text="{5554102,33}.[(($Enemies.{1}.distanceto.{player.ship})/1000)i,$Enemies.{1}.name]" section="PC_Move_Attack_selected" choiceparam="$Enemies.{1}" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
@@ -240,10 +240,10 @@
             </do_elseif>
             <!-- Advanced Commands (Independent of Target -->
             <do_elseif value="event.param == 'PC_Advanced'">
-              <add_player_choice position="1" text="{5554102,1}" section="PC_Hold_Position"/>
-              <add_player_choice position="2" text="{5554102,2}" section="PC_Follow_me"/>
-              <add_player_choice position="3" text="{5554102,3}" section="PC_Withdraw"/>
-              <add_player_choice position="4" text="{5554102,4}" section="PC_Patrol Zone" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
+              <add_player_choice position="1" text="{5554102,11}" section="PC_Hold_Position"/>
+              <add_player_choice position="2" text="{5554102,12}" section="PC_Follow_me"/>
+              <add_player_choice position="3" text="{5554102,13}" section="PC_Withdraw"/>
+              <add_player_choice position="4" text="{5554102,14}" section="PC_Patrol Zone" selectable="player.ship.dps.all" comment="only for Ships which are armed"/>
             </do_elseif>
             <do_elseif value="event.param == 'PC_Hold_Position'">
               <cancel_conversation/>
