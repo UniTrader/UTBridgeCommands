@@ -13,10 +13,6 @@
     <param name="withdraw" default="false"/>
     <param name="debugchance" default="0"/>
   </params>
-  <patch sinceversion="2">
-    <debug_text text="'patch'"/>
-    <set_value name="$withdraw" exact="false"/>
-  </patch>
   <attention min="unknown">
     <actions>
       <!-- Initial checks -->
