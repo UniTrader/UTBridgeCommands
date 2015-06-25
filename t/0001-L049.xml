@@ -19,6 +19,7 @@ no definite Scheme yet.
   <t id="5">Fliege zu: %1 Ziele</t>
   <t id="6">Fliege in diese Richtung</t>
   <t id="7">\033RGreife an: \033B%1 Ziele\033X</t>
+  <t id="8">Kommando an Kapitän</t>
   <!-- Advanced Commands (Slot 2) -->
   <t id="11">Halte Position</t>
   <t id="12">Folge mir</t>

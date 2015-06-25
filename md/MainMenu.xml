@@ -25,7 +25,7 @@
   </replace>
   <add sel="//cue[@name='SectionHandler_Nav']/actions/do_elseif[@value=&quot;event.param == &apos;gMainNav_select_plotcourse&apos;&quot;]">
     <do_if value="player.entity.container.isclass.ship and player.controlled != player.primaryship and player.entity.container.owner == faction.player">
-      <add_player_choice position="4" text="'Bridge Command'" section="PC_Selected_Object" choiceparam="event.param2.{1}"/>
+      <add_player_choice position="4" text="{5554102,8}" section="PC_Selected_Object" choiceparam="event.param2.{1}"/>
     </do_if>
   </add>
   </diff>

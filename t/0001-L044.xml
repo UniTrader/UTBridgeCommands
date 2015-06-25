@@ -19,6 +19,7 @@ no definite Scheme yet.
   <t id="5">Fly to: %1 Targets found</t>
   <t id="6">Fly in this Direction</t>
   <t id="7">\033RAttack: \033B%1 Targets found\033X</t>
+  <t id="8">Command to Captain</t>
   <!-- Advanced Commands (Slot 2) -->
   <t id="11">Hold Position</t>
   <t id="12">Follow me</t>
