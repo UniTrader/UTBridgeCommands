@@ -3,8 +3,8 @@
   <replace sel="//cue[@name=&quot;SectorMapStarted&quot;]/actions">
     <actions>
       <do_if value="player.entity.container.isclass.ship and player.controlled != player.primaryship and player.entity.container.owner == faction.player">
-        <cancel_conversation actor="player.copilot" />
         <signal_cue cue="md.UT_Platform_Commands.Ship_On_Hotkey_Press"/>
+        <cancel_conversation actor="player.copilot" />
       </do_if>
       <!-- redirect Sectormap Hotkey only when on a Bridge - otherwise Vanilla behavior -->
       <do_else>
@@ -23,4 +23,7 @@
       </do_else>
     </actions>
   </replace>
-</diff>
+  <add sel="//cue[@name='SectionHandler_Nav']/actions/do_elseif[@value=&quot;event.param == &apos;gMainNav_select_plotcourse&apos;&quot;]">
+    <add_player_choice position="4" text="'Bridge Command'" section="PC_Selected_Object" choiceparam="event.param2.{1}"/>
+  </add>
+  </diff>

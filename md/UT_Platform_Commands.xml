@@ -79,12 +79,29 @@
         <cue name="Ship_Action_Conservation" instantiate="true">
           <conditions>
             <check_any>
+              <event_player_changed_target/>
               <event_conversation_started conversation="Ship_Action_Conversation"/>
               <event_conversation_next_section sectionprefix="PC_"/>
             </check_any>
           </conditions>
           <actions>
-            <do_if value="event.name =='event_conversation_started'">
+            <!-- Player set Target via Map or Guidiance Menu - no need to search for possible Targets, just present Actions available for this Object -->
+            <do_if value="event.name == 'event_player_changed_target'">
+              <set_value name="$Objects" exact="[event.param]"/>
+              <set_value name="$Zones" exact="[]" comment="Menu part expects a $Zones variable, but no content needed"/>
+            </do_if>
+            <do_elseif value="event.param == 'PC_Selected_Object'">
+              <!-- in case the Player selected a space as Target -->
+              <do_if value="event.param2.isclass.zone or event.param2.isclass.sector or event.param2.isclass.cluster">
+                <set_value name="$Zones" exact="[event.param2]"/>
+                <set_value name="$Objects" exact="[]" comment="Menu part expects a $Objects variable, but no content needed"/>
+              </do_if>
+              <do_else>
+                <set_value name="$Objects" exact="[event.param2]"/>
+                <set_value name="$Zones" exact="[]" comment="Menu part expects a $Zones variable, but no content needed"/>
+              </do_else>
+            </do_elseif>
+            <do_elseif value="event.name =='event_conversation_started'">
               <!--========================================-->
               <!--=========== Find possible Targets ===========-->
               <!--========================================-->
@@ -132,6 +149,9 @@
               <do_if value="$Objects.indexof.{player.entity.container}">
                 <remove_value name="$Objects.{$Objects.indexof.{player.entity.container}}"/>
               </do_if>
+            </do_elseif>
+            <!-- Player Choices for either directly Selected Objects or the ones found via directional Search -->
+            <do_if value="event.name =='event_player_changed_target' or event.name == 'event_conversation_started' or event.param == 'PC_Selected_Object'">
               <!-- Sort found Objects into categories -->
               <create_list name="$Enemies"/>
               <create_list name="$Moveables"/>
@@ -284,7 +304,7 @@
               <add_player_choice position="close" text="'Exit'" section="PC_Exit"/>
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_Attack_friendlies'">
-              <add_npc_line speaker="player.computer" line="5000" comment="Attention! Target is not hostile."/>
+              <add_npc_line speaker="player.computer" line="5000" hidechoices="false" comment="Attention! Target is not hostile."/>
               <do_all exact="[event.param2.count,6].min" counter="$i">
                 <add_player_choice position="$i" text="{5554102,35}.[((event.param2.{$i}.distanceto.{player.ship})/1000)i,event.param2.{$i}.name]" section="PC_Move_Attack_selected" choiceparam="event.param2.{$i}"/>
               </do_all>
