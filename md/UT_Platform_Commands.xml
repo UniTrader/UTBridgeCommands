@@ -348,7 +348,7 @@
             <do_elseif value="event.param == 'PC_Move_FlyToPos_selected'">
               <cancel_conversation/>
               <include_actions ref="md.Orders.StopCurrentTask"/>
-              <signal_objects object="player.ship" param="'fly to pos'" param2="event.param2"/>
+              <signal_objects object="player.ship" param="'fly to pos - ut'" param2="event.param2"/>
               <speak actor="player.ship.pilot" line="[1012,1013,1018,1019,1032,1032].random" comment="confirmation move to pos" />
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_BarrelRoll'">
@@ -357,7 +357,7 @@
                 <position x="0m" y="0m" z="500m"/>
               </transform_position>
               <create_rotation name="$Rotation" yaw="player.ship.rotation.yaw" pitch="player.ship.rotation.pitch" roll="player.ship.rotation.roll+180deg"/>
-              <signal_objects object="player.ship" param="'fly to pos'" param2="$Position" param3="$Rotation" delay="100ms"/>
+              <signal_objects object="player.ship" param="'fly to pos - ut'" param2="$Position" param3="$Rotation" delay="100ms"/>
             </do_elseif>
             <do_elseif value="event.param == 'PC_Move_TurnAround'">
               <include_actions ref="md.Orders.StopCurrentTask"/>
